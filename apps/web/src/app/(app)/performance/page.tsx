@@ -27,6 +27,7 @@ export default function PerformancePage() {
   }
 
   useEffect(() => { load(); }, [mes, ano]);
+  useEffect(() => { setHistory({}); }, [ano]);
 
   async function loadHistory(kpiId: string) {
     if (history[kpiId]) return;

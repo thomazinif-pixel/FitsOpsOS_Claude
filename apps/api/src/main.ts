@@ -29,7 +29,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  const port = process.env.PORT || 3001;
+  const port = parseInt(process.env.PORT || '3001', 10);
   await app.listen(port);
   console.log(`🚀 Fits Ops OS API rodando em http://localhost:${port}`);
   console.log(`📚 Documentação: http://localhost:${port}/api/docs`);

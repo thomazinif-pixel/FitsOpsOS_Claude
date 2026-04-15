@@ -42,6 +42,7 @@ export default function InputMensalPage() {
         .map(([kpiId, v]) => ({ kpiId, mes, ano, valorRealizado: parseFloat(v) }));
       await apiClient.post('/kpi-values/bulk', { items });
       setSavedMsg(`${items.length} valores salvos com sucesso!`);
+      setTimeout(() => setSavedMsg(''), 3000);
       load();
     } finally {
       setSaving(false);
@@ -58,7 +59,11 @@ export default function InputMensalPage() {
     const v = values[kpi.id];
     if (!v || isNaN(parseFloat(v))) return null;
     const val = parseFloat(v);
-    if (kpi.direcao === 'UP') return (val / kpi.metaMensal) * 100;
+    if (kpi.direcao === 'UP') {
+      if (kpi.metaMensal === 0) return null;
+      return (val / kpi.metaMensal) * 100;
+    }
+    if (val === 0) return null;
     return (kpi.metaMensal / val) * 100;
   }
 

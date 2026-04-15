@@ -23,6 +23,7 @@ export default function DashboardPage() {
     setLoading(true);
     apiClient.get(`/dashboard/summary?mes=${mes}&ano=${ano}`)
       .then((r) => setData(r.data))
+      .catch(() => setData(null))
       .finally(() => setLoading(false));
   }, [mes, ano]);
 

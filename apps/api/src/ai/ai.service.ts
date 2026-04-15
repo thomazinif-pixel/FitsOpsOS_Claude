@@ -1,4 +1,4 @@
-import { Injectable, ServiceUnavailableException } from '@nestjs/common';
+import { Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import OpenAI from 'openai';
@@ -22,7 +22,7 @@ export class AiService {
       });
 
       if (analyses.length === 0) {
-        return { error: 'Nenhum dado encontrado para o período selecionado' };
+        throw new NotFoundException('Nenhum dado encontrado para o período selecionado');
       }
 
       const totalPeso = analyses.reduce((s, a) => s + a.kpi.peso, 0);
@@ -80,7 +80,7 @@ Produza:
   async getActionSuggestions(kpiId: string, mes: number, ano: number) {
     try {
       const kpi = await this.prisma.kPI.findUnique({ where: { id: kpiId } });
-      if (!kpi) return { error: 'KPI não encontrado' };
+      if (!kpi) throw new NotFoundException('KPI não encontrado');
 
       const prevMonths = [];
       let m = mes, a = ano;
@@ -167,7 +167,7 @@ Responda em JSON válido com o formato: { "planos": [{ "descricao": "", "respons
       });
 
       if (analyses.length === 0) {
-        return { error: 'Nenhum dado encontrado para o período selecionado' };
+        throw new NotFoundException('Nenhum dado encontrado para o período selecionado');
       }
 
       const totalPeso = analyses.reduce((s, a) => s + a.kpi.peso, 0);

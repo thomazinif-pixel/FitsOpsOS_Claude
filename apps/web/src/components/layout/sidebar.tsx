@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth-store';
 import { cn } from '@/lib/utils';
 
@@ -15,6 +15,7 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, clearAuth } = useAuthStore();
 
   return (
@@ -71,7 +72,7 @@ export function Sidebar() {
           </div>
         </div>
         <button
-          onClick={clearAuth}
+          onClick={() => { clearAuth(); router.push('/login'); }}
           className="w-full text-left text-gray-500 hover:text-white text-xs transition-colors py-1"
         >
           Sair do sistema →

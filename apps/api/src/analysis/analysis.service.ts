@@ -48,8 +48,10 @@ export class AnalysisService {
     // Compute percentual atingimento
     let percentualAtingimento: number;
     if (kpi.direcao === 'UP') {
+      if (kpi.metaMensal === 0) return null;
       percentualAtingimento = (kpiValue.valorRealizado / kpi.metaMensal) * 100;
     } else {
+      if (kpiValue.valorRealizado === 0) return null;
       percentualAtingimento = (kpi.metaMensal / kpiValue.valorRealizado) * 100;
     }
     percentualAtingimento = Math.round(percentualAtingimento * 10) / 10;

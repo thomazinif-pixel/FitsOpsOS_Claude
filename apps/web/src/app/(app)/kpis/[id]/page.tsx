@@ -18,6 +18,7 @@ export default function KpiDetailPage() {
   useEffect(() => {
     apiClient.get(`/kpis/${id}`)
       .then((r) => setKpi(r.data))
+      .catch(() => setKpi(null))
       .finally(() => setLoading(false));
   }, [id]);
 

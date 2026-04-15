@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  VIEWER
+}
+
+enum Categoria {
+  CRESCIMENTO
+  EFICIENCIA
+  QUALIDADE
+  EXPERIENCIA
+}
+
+enum Unidade {
+  PERCENTUAL
+  DIAS
+  REAIS
+  QUANTIDADE
+}
+
+enum Direcao {
+  UP
+  DOWN
+}
+
+enum StatusKPI {
+  GREEN
+  YELLOW
+  RED
+}
+
+enum Tendencia {
+  UP
+  DOWN
+  STABLE
+}
+
+enum StatusPlano {
+  PENDENTE
+  EM_ANDAMENTO
+  CONCLUIDO
+  CANCELADO
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         Role     @default(VIEWER)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model KPI {
+  id          String    @id @default(cuid())
+  nome        String
+  descricao   String?
+  categoria   Categoria
+  unidade     Unidade
+  metaAnual   Float     @map("meta_anual")
+  metaMensal  Float     @map("meta_mensal")
+  direcao     Direcao
+  peso        Float     @default(1.0)
+  ativo       Boolean   @default(true)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  values      KPIValue[]
+  analyses    KPIAnalysis[]
+  actionPlans ActionPlan[]
+
+  @@map("kpis")
+}
+
+model KPIValue {
+  id             String   @id @default(cuid())
+  kpiId          String   @map("kpi_id")
+  mes            Int
+  ano            Int
+  valorRealizado Float    @map("valor_realizado")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  kpi KPI @relation(fields: [kpiId], references: [id], onDelete: Cascade)
+
+  @@unique([kpiId, mes, ano])
+  @@map("kpi_values")
+}
+
+model KPIAnalysis {
+  id                    String    @id @default(cuid())
+  kpiId                 String    @map("kpi_id")
+  mes                   Int
+  ano                   Int
+  percentualAtingimento Float     @map("percentual_atingimento")
+  status                StatusKPI
+  tendencia             Tendencia
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  kpi KPI @relation(fields: [kpiId], references: [id], onDelete: Cascade)
+
+  @@unique([kpiId, mes, ano])
+  @@map("kpi_analyses")
+}
+
+model ActionPlan {
+  id              String      @id @default(cuid())
+  kpiId           String      @map("kpi_id")
+  descricao       String
+  responsavel     String
+  prazo           DateTime
+  status          StatusPlano @default(PENDENTE)
+  impactoEstimado String?     @map("impacto_estimado")
+  aiGenerated     Boolean     @default(false) @map("ai_generated")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  kpi KPI @relation(fields: [kpiId], references: [id], onDelete: Cascade)
+
+  @@map("action_plans")
+}

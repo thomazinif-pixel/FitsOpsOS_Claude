@@ -1,4 +1,4 @@
-FROM node:18-alpine AS builder
+FROM node:18-slim AS builder
 WORKDIR /app
 
 COPY package*.json ./
@@ -10,7 +10,7 @@ RUN ./node_modules/.bin/prisma generate
 COPY . .
 RUN ./node_modules/.bin/nest build
 
-FROM node:18-alpine
+FROM node:18-slim
 WORKDIR /app
 
 COPY package*.json ./

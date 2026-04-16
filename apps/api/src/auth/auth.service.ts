@@ -27,7 +27,7 @@ export class AuthService {
 
     return {
       access_token,
-      user: { id: user.id, nome: user.nome, email: user.email, role: user.role, cargo: user.cargo },
+      user: { id: user.id, nome: user.nome, email: user.email, role: user.role, cargo: user.cargo, departmentId: user.departmentId },
     };
   }
 }

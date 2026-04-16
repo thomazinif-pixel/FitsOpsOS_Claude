@@ -131,17 +131,18 @@ export function KpiForm({ open, onClose, onSave, initial }: KpiFormProps) {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Peso</label>
-            <input {...field('peso')} type="number" step="0.1" min="0.1" className={inputClass} />
+            <label className="block text-xs font-medium text-gray-600 mb-1">Peso *</label>
+            <input {...field('peso')} type="number" step="0.1" min="0.1" className={inputClass} required />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1">Responsável (Owner)</label>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Responsável (Owner) *</label>
             <select
               value={form.ownerId}
               onChange={(e) => handleOwnerChange(e.target.value)}
               className={selectClass}
+              required
             >
-              <option value="">Sem responsável</option>
+              <option value="" disabled>Selecione o responsável</option>
               {users.map((u) => (
                 <option key={u.id} value={u.id}>{u.nome} ({u.cargo})</option>
               ))}

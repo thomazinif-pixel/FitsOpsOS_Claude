@@ -32,21 +32,19 @@ export class CreateKpiDto {
   @IsEnum(Direcao)
   direcao: Direcao;
 
-  @ApiPropertyOptional({ example: 1.0 })
+  @ApiProperty({ example: 1.0 })
   @IsNumber()
-  @IsOptional()
   @Min(0.1)
-  peso?: number;
+  peso: number;
 
   @ApiPropertyOptional({ default: true })
   @IsBoolean()
   @IsOptional()
   ativo?: boolean;
 
-  @ApiPropertyOptional({ description: 'ID do usuário responsável pelo KPI' })
+  @ApiProperty({ description: 'ID do usuário responsável pelo KPI' })
   @IsString()
-  @IsOptional()
-  ownerId?: string;
+  ownerId: string;
 
   @ApiPropertyOptional({ description: 'ID do departamento do KPI' })
   @IsString()

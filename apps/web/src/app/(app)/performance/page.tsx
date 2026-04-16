@@ -97,6 +97,8 @@ export default function PerformancePage() {
               <tr className="border-b border-gray-100 bg-gray-50">
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">KPI</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Categoria</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Responsável</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Área</th>
                 <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Atingimento</th>
                 <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
                 <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Tendência</th>
@@ -109,6 +111,8 @@ export default function PerformancePage() {
                   <tr key={a.id} className="border-b border-gray-50 hover:bg-gray-50">
                     <td className="px-4 py-3 font-medium text-gray-900 text-sm">{a.kpi?.nome}</td>
                     <td className="px-4 py-3 text-sm text-gray-500">{a.kpi ? categoriaLabels[a.kpi.categoria] : '—'}</td>
+                    <td className="px-4 py-3 text-sm text-gray-700">{a.kpi?.owner?.nome || <span className="text-gray-400">—</span>}</td>
+                    <td className="px-4 py-3 text-sm text-gray-500">{a.kpi?.department?.nome || <span className="text-gray-400">—</span>}</td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <div className="w-20 bg-gray-100 rounded-full h-1.5">
@@ -136,7 +140,7 @@ export default function PerformancePage() {
                   </tr>
                   {expanded === a.kpiId && (
                     <tr key={`${a.id}-detail`} className="bg-gray-50">
-                      <td colSpan={6} className="px-4 py-4">
+                      <td colSpan={8} className="px-4 py-4">
                         {history[a.kpiId] ? (
                           <ResponsiveContainer width="100%" height={140}>
                             <LineChart data={history[a.kpiId]}>
@@ -158,7 +162,7 @@ export default function PerformancePage() {
                 </>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={6} className="text-center py-12 text-gray-400 text-sm">Nenhum dado encontrado para o período</td></tr>
+                <tr><td colSpan={8} className="text-center py-12 text-gray-400 text-sm">Nenhum dado encontrado para o período</td></tr>
               )}
             </tbody>
           </table>

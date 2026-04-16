@@ -11,7 +11,14 @@ export class AnalysisService {
     if (ano) where.ano = ano;
     return this.prisma.kPIAnalysis.findMany({
       where,
-      include: { kpi: true },
+      include: {
+          kpi: {
+            include: {
+              owner: { select: { id: true, nome: true, cargo: true } },
+              department: { select: { id: true, nome: true } },
+            },
+          },
+        },
       orderBy: [{ ano: 'desc' }, { mes: 'desc' }],
     });
   }

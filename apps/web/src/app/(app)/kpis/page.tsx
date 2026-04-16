@@ -103,6 +103,8 @@ export default function KpisPage() {
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Categoria</th>
                 <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Meta Mensal</th>
                 <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Direção</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Responsável</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Área</th>
                 <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Peso</th>
                 <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
                 {isAdmin && <th className="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Ações</th>}
@@ -126,6 +128,8 @@ export default function KpisPage() {
                         {kpi.direcao === 'UP' ? '↑ UP' : '↓ DOWN'}
                       </span>
                     </td>
+                    <td className="px-4 py-3 text-sm text-gray-700">{kpi.owner?.nome || <span className="text-gray-400">—</span>}</td>
+                    <td className="px-4 py-3 text-sm text-gray-500">{kpi.department?.nome || <span className="text-gray-400">—</span>}</td>
                     <td className="px-4 py-3 text-center text-sm text-gray-600">{kpi.peso}x</td>
                     <td className="px-4 py-3 text-center">
                       {lastAnalysis ? <StatusBadge status={lastAnalysis.status} /> : <span className="text-xs text-gray-400">—</span>}
@@ -148,7 +152,7 @@ export default function KpisPage() {
                 );
               })}
               {kpis.length === 0 && (
-                <tr><td colSpan={7} className="text-center py-12 text-gray-400 text-sm">Nenhum KPI encontrado</td></tr>
+                <tr><td colSpan={9} className="text-center py-12 text-gray-400 text-sm">Nenhum KPI encontrado</td></tr>
               )}
             </tbody>
           </table>

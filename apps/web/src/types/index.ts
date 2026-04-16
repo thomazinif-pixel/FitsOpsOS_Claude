@@ -1,4 +1,6 @@
-export type Role = 'ADMIN' | 'VIEWER';
+export type Role = 'ADMIN' | 'MANAGER' | 'VIEWER';
+export type Cargo = 'COO' | 'MANAGER' | 'ANALYST';
+export type UserStatus = 'ACTIVE' | 'BLOCKED';
 export type Categoria = 'CRESCIMENTO' | 'EFICIENCIA' | 'QUALIDADE' | 'EXPERIENCIA';
 export type Unidade = 'PERCENTUAL' | 'DIAS' | 'REAIS' | 'QUANTIDADE';
 export type Direcao = 'UP' | 'DOWN';
@@ -8,8 +10,20 @@ export type StatusPlano = 'PENDENTE' | 'EM_ANDAMENTO' | 'CONCLUIDO' | 'CANCELADO
 
 export interface User {
   id: string;
+  nome: string;
   email: string;
   role: Role;
+  cargo: Cargo;
+  status: UserStatus;
+  ultimoLogin?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Department {
+  id: string;
+  nome: string;
+  createdAt?: string;
 }
 
 export interface KPI {
@@ -24,6 +38,10 @@ export interface KPI {
   peso: number;
   ativo: boolean;
   createdAt: string;
+  ownerId?: string;
+  departmentId?: string;
+  owner?: Pick<User, 'id' | 'nome' | 'email' | 'cargo'>;
+  department?: Pick<Department, 'id' | 'nome'>;
   analyses?: KPIAnalysis[];
   values?: KPIValue[];
   actionPlans?: ActionPlan[];
@@ -75,6 +93,23 @@ export interface DashboardSummary {
   rankingMelhores: RankingItem[];
   rankingPiores: RankingItem[];
   tendencias: TendenciaSerie[];
+  performancePorArea?: { area: string; media: number | null }[];
+  heatmapData?: HeatmapKPI[];
+  alertasQuedaConsecutiva?: AlertaQuedaItem[];
+}
+
+export interface HeatmapKPI {
+  kpiId: string;
+  kpiNome: string;
+  cells: { mes: number; ano: number; label: string; status: string | null; percentual: number | null }[];
+}
+
+export interface AlertaQuedaItem {
+  kpiId: string;
+  nome: string;
+  categoria: Categoria;
+  valores: (number | null)[];
+  meses: { mes: number; ano: number }[];
 }
 
 export interface CategorySummary {

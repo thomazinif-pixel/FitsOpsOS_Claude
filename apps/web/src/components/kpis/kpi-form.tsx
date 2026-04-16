@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { KPI } from '@/types';
+import { KPI, User, Department } from '@/types';
 import { Modal } from '@/components/ui/modal';
+import apiClient from '@/lib/api-client';
 
 interface KpiFormProps {
   open: boolean;
@@ -19,10 +20,19 @@ export function KpiForm({ open, onClose, onSave, initial }: KpiFormProps) {
   const [form, setForm] = useState({
     nome: '', descricao: '', categoria: 'CRESCIMENTO',
     unidade: 'PERCENTUAL', metaAnual: '', metaMensal: '',
-    direcao: 'UP', peso: '1',
+    direcao: 'UP', peso: '1', ownerId: '', departmentId: '',
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [users, setUsers] = useState<User[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+
+  useEffect(() => {
+    if (open) {
+      apiClient.get('/users').then((r) => setUsers(r.data)).catch(() => {});
+      apiClient.get('/departments').then((r) => setDepartments(r.data)).catch(() => {});
+    }
+  }, [open]);
 
   useEffect(() => {
     if (initial) {
@@ -31,9 +41,10 @@ export function KpiForm({ open, onClose, onSave, initial }: KpiFormProps) {
         categoria: initial.categoria, unidade: initial.unidade,
         metaAnual: String(initial.metaAnual), metaMensal: String(initial.metaMensal),
         direcao: initial.direcao, peso: String(initial.peso),
+        ownerId: initial.ownerId || '', departmentId: initial.departmentId || '',
       });
     } else {
-      setForm({ nome: '', descricao: '', categoria: 'CRESCIMENTO', unidade: 'PERCENTUAL', metaAnual: '', metaMensal: '', direcao: 'UP', peso: '1' });
+      setForm({ nome: '', descricao: '', categoria: 'CRESCIMENTO', unidade: 'PERCENTUAL', metaAnual: '', metaMensal: '', direcao: 'UP', peso: '1', ownerId: '', departmentId: '' });
     }
   }, [initial, open]);
 
@@ -47,6 +58,8 @@ export function KpiForm({ open, onClose, onSave, initial }: KpiFormProps) {
         metaAnual: parseFloat(form.metaAnual),
         metaMensal: parseFloat(form.metaMensal),
         peso: parseFloat(form.peso),
+        ownerId: form.ownerId || undefined,
+        departmentId: form.departmentId || undefined,
       } as any);
       onClose();
     } catch (e: any) {
@@ -105,6 +118,24 @@ export function KpiForm({ open, onClose, onSave, initial }: KpiFormProps) {
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Peso</label>
             <input {...field('peso')} type="number" step="0.1" min="0.1" className={inputClass} />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Responsável (Owner)</label>
+            <select {...field('ownerId')} className={selectClass}>
+              <option value="">Sem responsável</option>
+              {users.map((u) => (
+                <option key={u.id} value={u.id}>{u.nome} ({u.cargo})</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Departamento / Área</label>
+            <select {...field('departmentId')} className={selectClass}>
+              <option value="">Sem área</option>
+              {departments.map((d) => (
+                <option key={d.id} value={d.id}>{d.nome}</option>
+              ))}
+            </select>
           </div>
         </div>
         {error && <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">{error}</div>}

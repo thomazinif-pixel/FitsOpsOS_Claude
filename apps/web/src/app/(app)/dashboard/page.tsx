@@ -9,6 +9,8 @@ import { TrendChart } from '@/components/dashboard/trend-chart';
 import { RankingChart } from '@/components/dashboard/ranking-chart';
 import { AlertPanel } from '@/components/dashboard/alert-panel';
 import { AiInsightsPanel } from '@/components/dashboard/ai-insights-panel';
+import { AreaChart } from '@/components/dashboard/area-chart';
+import { Heatmap } from '@/components/dashboard/heatmap';
 import { LoadingPage } from '@/components/ui/spinner';
 import { mesesLabels } from '@/lib/utils';
 
@@ -89,9 +91,19 @@ export default function DashboardPage() {
 
           {/* Row 4: Alerts + AI */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <AlertPanel alertas={data.alertas || []} />
+            <AlertPanel alertas={data.alertas || []} alertasQueda={data.alertasQuedaConsecutiva} />
             <AiInsightsPanel mes={mes} ano={ano} />
           </div>
+
+          {/* Row 5: Performance por Área */}
+          {data.performancePorArea && data.performancePorArea.length > 0 && (
+            <AreaChart data={data.performancePorArea} />
+          )}
+
+          {/* Row 6: Heatmap */}
+          {data.heatmapData && data.heatmapData.length > 0 && (
+            <Heatmap data={data.heatmapData} />
+          )}
         </div>
       )}
     </div>

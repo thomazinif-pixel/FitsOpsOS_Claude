@@ -42,4 +42,14 @@ export class CreateKpiDto {
   @IsBoolean()
   @IsOptional()
   ativo?: boolean;
+
+  @ApiPropertyOptional({ description: 'ID do usuário responsável pelo KPI' })
+  @IsString()
+  @IsOptional()
+  ownerId?: string;
+
+  @ApiPropertyOptional({ description: 'ID do departamento do KPI' })
+  @IsString()
+  @IsOptional()
+  departmentId?: string;
 }

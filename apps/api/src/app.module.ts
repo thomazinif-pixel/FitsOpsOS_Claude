@@ -9,6 +9,7 @@ import { AnalysisModule } from './analysis/analysis.module';
 import { ActionPlansModule } from './action-plans/action-plans.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { AiModule } from './ai/ai.module';
+import { DepartmentsModule } from './departments/departments.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -23,6 +24,7 @@ import { HealthController } from './health.controller';
     ActionPlansModule,
     DashboardModule,
     AiModule,
+    DepartmentsModule,
   ],
   controllers: [HealthController],
 })

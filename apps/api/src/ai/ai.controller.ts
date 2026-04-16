@@ -27,4 +27,10 @@ export class AiController {
   getInsights(@Body() body: { mes: number; ano: number }) {
     return this.aiService.getInsights(body.mes, body.ano);
   }
+
+  @Post('trend-analysis')
+  @ApiOperation({ summary: 'Análise de tendências e padrões dos últimos 6 meses via IA' })
+  getTrendAnalysis(@Body() body: { mes: number; ano: number }) {
+    return this.aiService.getTrendAnalysis(body.mes, body.ano);
+  }
 }

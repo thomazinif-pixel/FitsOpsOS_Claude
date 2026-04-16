@@ -19,6 +19,8 @@ export class KpisService {
       include: {
         analyses: { orderBy: [{ ano: 'desc' }, { mes: 'desc' }], take: 1 },
         _count: { select: { actionPlans: { where: { status: { not: 'CONCLUIDO' } } } } },
+        owner: { select: { id: true, nome: true, email: true, cargo: true } },
+        department: { select: { id: true, nome: true } },
       },
     });
   }
@@ -30,6 +32,8 @@ export class KpisService {
         analyses: { orderBy: [{ ano: 'desc' }, { mes: 'desc' }] },
         actionPlans: { orderBy: { createdAt: 'desc' } },
         values: { orderBy: [{ ano: 'desc' }, { mes: 'desc' }] },
+        owner: { select: { id: true, nome: true, email: true, cargo: true } },
+        department: { select: { id: true, nome: true } },
       },
     });
     if (!kpi) throw new NotFoundException(`KPI ${id} não encontrado`);

@@ -79,7 +79,10 @@ Produza:
 
   async getActionSuggestions(kpiId: string, mes: number, ano: number) {
     try {
-      const kpi = await this.prisma.kPI.findUnique({ where: { id: kpiId } });
+      const kpi = await this.prisma.kPI.findUnique({
+        where: { id: kpiId },
+        include: { owner: { select: { nome: true, cargo: true } }, department: { select: { nome: true } } },
+      });
       if (!kpi) throw new NotFoundException('KPI não encontrado');
 
       const prevMonths = [];
@@ -110,11 +113,16 @@ Produza:
         select: { descricao: true, status: true },
       });
 
+      const ownerInfo = kpi.owner ? `Responsável atual: ${kpi.owner.nome} (${kpi.owner.cargo})` : '';
+      const deptInfo = kpi.department ? `Departamento: ${kpi.department.nome}` : '';
+
       const prompt = `KPI: ${kpi.nome}
 Categoria: ${kpi.categoria}
 Direção: ${kpi.direcao} (UP = quanto maior melhor, DOWN = quanto menor melhor)
 Unidade: ${kpi.unidade}
 Meta Mensal: ${kpi.metaMensal}
+${ownerInfo}
+${deptInfo}
 Últimos 3 meses: ${historico.join(' | ')}
 Atingimento atual: ${analysis?.percentualAtingimento ?? '?'}% — Status: ${analysis?.status ?? '?'}
 Planos ativos existentes: ${existingPlans.map(p => `"${p.descricao}" (${p.status})`).join('; ') || 'nenhum'}
@@ -215,6 +223,72 @@ Produza exatamente o seguinte JSON:
       });
 
       return JSON.parse(response.choices[0].message.content);
+    } catch (err) {
+      throw new ServiceUnavailableException('Serviço de IA temporariamente indisponível.');
+    }
+  }
+
+  async getTrendAnalysis(mes: number, ano: number) {
+    try {
+      const months: { mes: number; ano: number }[] = [];
+      let m = mes, a = ano;
+      for (let i = 0; i < 6; i++) {
+        months.unshift({ mes: m, ano: a });
+        m--; if (m === 0) { m = 12; a--; }
+      }
+
+      const kpis = await this.prisma.kPI.findMany({
+        where: { ativo: true },
+        include: { department: { select: { nome: true } } },
+      });
+
+      const seriesData = await Promise.all(
+        kpis.map(async (kpi) => {
+          const series = await Promise.all(
+            months.map(async ({ mes: pm, ano: pa }) => {
+              const an = await this.prisma.kPIAnalysis.findUnique({
+                where: { kpiId_mes_ano: { kpiId: kpi.id, mes: pm, ano: pa } },
+              });
+              return { mes: pm, ano: pa, percentual: an?.percentualAtingimento ?? null, status: an?.status ?? null };
+            }),
+          );
+          return { nome: kpi.nome, categoria: kpi.categoria, departamento: kpi.department?.nome ?? 'Sem área', series };
+        }),
+      );
+
+      const prompt = `Analise as tendências dos KPIs operacionais bancários nos últimos 6 meses (${months[0].mes}/${months[0].ano} a ${mes}/${ano}):
+
+${JSON.stringify(seriesData, null, 2)}
+
+Identifique padrões e produza o seguinte JSON:
+{
+  "padroes": [
+    {
+      "tipo": "QUEDA_EFICIENCIA" | "AUMENTO_INCIDENTES" | "RISCO_OPERACIONAL" | "TENDENCIA_POSITIVA" | "INSTABILIDADE",
+      "descricao": "descrição clara do padrão detectado",
+      "kpis_afetados": ["nome do KPI"],
+      "severidade": "ALTA" | "MEDIA" | "BAIXA"
+    }
+  ],
+  "resumo_periodo": "parágrafo resumindo o período",
+  "recomendacao_prioritaria": "ação mais urgente recomendada"
+}`;
+
+      const response = await this.openai.chat.completions.create({
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'system',
+            content: 'Você é um analista de risco operacional bancário. Detecte padrões e tendências nos dados de KPIs. Responda APENAS com JSON válido, sem markdown.',
+          },
+          { role: 'user', content: prompt },
+        ],
+        max_tokens: 2000,
+        temperature: 0.3,
+        response_format: { type: 'json_object' },
+      });
+
+      return { ...JSON.parse(response.choices[0].message.content), mes, ano };
     } catch (err) {
       throw new ServiceUnavailableException('Serviço de IA temporariamente indisponível.');
     }

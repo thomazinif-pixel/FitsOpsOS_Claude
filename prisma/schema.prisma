@@ -9,7 +9,19 @@ datasource db {
 
 enum Role {
   ADMIN
+  MANAGER
   VIEWER
+}
+
+enum Cargo {
+  COO
+  MANAGER
+  ANALYST
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
 }
 
 enum Categoria {
@@ -51,29 +63,50 @@ enum StatusPlano {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  passwordHash String   @map("password_hash")
-  role         Role     @default(VIEWER)
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id           String     @id @default(cuid())
+  nome         String
+  email        String     @unique
+  passwordHash String     @map("password_hash")
+  role         Role       @default(VIEWER)
+  cargo        Cargo      @default(ANALYST)
+  status       UserStatus @default(ACTIVE)
+  ultimoLogin  DateTime?  @map("ultimo_login")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  kpisOwned KPI[] @relation("KpiOwner")
 
   @@map("users")
 }
 
+model Department {
+  id        String   @id @default(cuid())
+  nome      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+
+  kpis KPI[]
+
+  @@map("departments")
+}
+
 model KPI {
-  id          String    @id @default(cuid())
-  nome        String
-  descricao   String?
-  categoria   Categoria
-  unidade     Unidade
-  metaAnual   Float     @map("meta_anual")
-  metaMensal  Float     @map("meta_mensal")
-  direcao     Direcao
-  peso        Float     @default(1.0)
-  ativo       Boolean   @default(true)
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
+  id           String     @id @default(cuid())
+  nome         String
+  descricao    String?
+  categoria    Categoria
+  unidade      Unidade
+  metaAnual    Float      @map("meta_anual")
+  metaMensal   Float      @map("meta_mensal")
+  direcao      Direcao
+  peso         Float      @default(1.0)
+  ativo        Boolean    @default(true)
+  ownerId      String?    @map("owner_id")
+  departmentId String?    @map("department_id")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  owner      User?       @relation("KpiOwner", fields: [ownerId], references: [id])
+  department Department? @relation(fields: [departmentId], references: [id])
 
   values      KPIValue[]
   analyses    KPIAnalysis[]

@@ -6,11 +6,13 @@ import { useAuthStore } from '@/store/auth-store';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { href: '/dashboard',      label: 'Dashboard',            icon: '▦' },
-  { href: '/kpis',           label: 'Gestão de KPIs',       icon: '⊞' },
-  { href: '/input-mensal',   label: 'Input Mensal',         icon: '✎' },
-  { href: '/performance',    label: 'Performance',          icon: '◈' },
-  { href: '/planos-acao',    label: 'Planos de Ação',       icon: '◉' },
+  { href: '/dashboard',      label: 'Dashboard',            icon: '▦',  roles: [] },
+  { href: '/kpis',           label: 'Gestão de KPIs',       icon: '⊞',  roles: [] },
+  { href: '/input-mensal',   label: 'Input Mensal',         icon: '✎',  roles: [] },
+  { href: '/performance',    label: 'Performance',          icon: '◈',  roles: [] },
+  { href: '/planos-acao',    label: 'Planos de Ação',       icon: '◉',  roles: [] },
+  { href: '/insights',       label: 'IA Insights',          icon: '◎',  roles: [] },
+  { href: '/users',          label: 'Usuários',             icon: '◑',  roles: ['ADMIN'] },
 ];
 
 export function Sidebar() {
@@ -35,24 +37,26 @@ export function Sidebar() {
 
       {/* Nav */}
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-        {navItems.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(item.href + '/');
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors',
-                active
-                  ? 'bg-brand-green text-white font-medium'
-                  : 'text-gray-400 hover:bg-gray-800 hover:text-white',
-              )}
-            >
-              <span className="text-base">{item.icon}</span>
-              {item.label}
-            </Link>
-          );
-        })}
+        {navItems
+          .filter((item) => item.roles.length === 0 || item.roles.includes(user?.role ?? ''))
+          .map((item) => {
+            const active = pathname === item.href || pathname.startsWith(item.href + '/');
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors',
+                  active
+                    ? 'bg-brand-green text-white font-medium'
+                    : 'text-gray-400 hover:bg-gray-800 hover:text-white',
+                )}
+              >
+                <span className="text-base">{item.icon}</span>
+                {item.label}
+              </Link>
+            );
+          })}
       </nav>
 
       {/* User */}
@@ -62,7 +66,7 @@ export function Sidebar() {
             <span className="text-white text-xs font-bold">{user?.email?.[0]?.toUpperCase()}</span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-white text-xs font-medium truncate">{user?.email}</p>
+            <p className="text-white text-xs font-medium truncate">{(user as any)?.nome || user?.email}</p>
             <span className={cn(
               'text-xs px-1.5 py-0.5 rounded font-medium',
               user?.role === 'ADMIN' ? 'bg-brand-green text-white' : 'bg-gray-700 text-gray-300'
@@ -71,6 +75,12 @@ export function Sidebar() {
             </span>
           </div>
         </div>
+        <Link
+          href="/perfil"
+          className="block w-full text-left text-gray-500 hover:text-white text-xs transition-colors py-1"
+        >
+          Meu perfil →
+        </Link>
         <button
           onClick={() => { clearAuth(); router.push('/login'); }}
           className="w-full text-left text-gray-500 hover:text-white text-xs transition-colors py-1"

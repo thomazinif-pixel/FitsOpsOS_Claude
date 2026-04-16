@@ -7,7 +7,9 @@
     "start": "node dist/src/main",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\""
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
+    "db:seed": "ts-node -r tsconfig-paths/register prisma/seed.ts",
+    "db:seed:prod": "ts-node -r tsconfig-paths/register prisma/seed-prod.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.3.2",

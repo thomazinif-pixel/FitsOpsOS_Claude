@@ -107,13 +107,14 @@ export default function UsersPage() {
   }
 
   async function handleSave() {
+    if (!form.departmentId) {
+      setError('Selecione um departamento.');
+      return;
+    }
     setSaving(true);
     setError('');
     try {
-      const payload = {
-        ...form,
-        departmentId: form.departmentId || undefined,
-      };
+      const payload = { ...form };
       if (modal === 'create') {
         await apiClient.post('/users', payload);
         flash('Usuário criado com sucesso!');
@@ -327,13 +328,14 @@ export default function UsersPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Departamento</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Departamento *</label>
                 <select
                   value={form.departmentId}
                   onChange={(e) => setForm((f) => ({ ...f, departmentId: e.target.value }))}
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-green"
+                  required
                 >
-                  <option value="">Sem departamento</option>
+                  <option value="" disabled>Selecione o departamento</option>
                   {departments.map((d) => (
                     <option key={d.id} value={d.id}>{d.nome}</option>
                   ))}

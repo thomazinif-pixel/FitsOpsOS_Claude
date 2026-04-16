@@ -1,5 +1,5 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsEnum, IsString, MinLength } from 'class-validator';
 import { Role, Cargo } from '@prisma/client';
 
 export class CreateUserDto {
@@ -24,8 +24,7 @@ export class CreateUserDto {
   @IsEnum(Cargo)
   cargo: Cargo;
 
-  @ApiPropertyOptional({ description: 'ID do departamento do usuário' })
+  @ApiProperty({ description: 'ID do departamento do usuário' })
   @IsString()
-  @IsOptional()
-  departmentId?: string;
+  departmentId: string;
 }

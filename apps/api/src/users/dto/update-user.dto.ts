@@ -22,4 +22,9 @@ export class UpdateUserDto {
   @IsOptional()
   @IsEnum(Cargo)
   cargo?: Cargo;
+
+  @ApiPropertyOptional({ description: 'ID do departamento do usuário' })
+  @IsOptional()
+  @IsString()
+  departmentId?: string;
 }

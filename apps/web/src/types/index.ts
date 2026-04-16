@@ -18,6 +18,8 @@ export interface User {
   ultimoLogin?: string;
   createdAt?: string;
   updatedAt?: string;
+  departmentId?: string;
+  department?: Pick<Department, 'id' | 'nome'>;
 }
 
 export interface Department {

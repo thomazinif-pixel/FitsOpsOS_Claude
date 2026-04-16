@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import apiClient from '@/lib/api-client';
-import { User, Role, Cargo } from '@/types';
+import { User, Role, Cargo, Department } from '@/types';
 import { useAuthStore } from '@/store/auth-store';
 import { cn } from '@/lib/utils';
 
@@ -17,9 +17,10 @@ interface FormData {
   password: string;
   role: Role;
   cargo: Cargo;
+  departmentId: string;
 }
 
-const defaultForm: FormData = { nome: '', email: '', password: '', role: 'VIEWER', cargo: 'ANALYST' };
+const defaultForm: FormData = { nome: '', email: '', password: '', role: 'VIEWER', cargo: 'ANALYST', departmentId: '' };
 
 function StatusBadge({ status }: { status: string }) {
   return (
@@ -48,6 +49,7 @@ function RoleBadge({ role }: { role: string }) {
 export default function UsersPage() {
   const { user: currentUser } = useAuthStore();
   const [users, setUsers] = useState<User[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState('');
   const [filterRole, setFilterRole] = useState('');
@@ -63,8 +65,12 @@ export default function UsersPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await apiClient.get('/users');
-      setUsers(data);
+      const [usersRes, deptsRes] = await Promise.all([
+        apiClient.get('/users'),
+        apiClient.get('/departments'),
+      ]);
+      setUsers(usersRes.data);
+      setDepartments(deptsRes.data);
     } catch {
       setUsers([]);
     } finally {
@@ -88,7 +94,7 @@ export default function UsersPage() {
   }
 
   function openEdit(u: User) {
-    setForm({ nome: u.nome, email: u.email, password: '', role: u.role, cargo: u.cargo });
+    setForm({ nome: u.nome, email: u.email, password: '', role: u.role, cargo: u.cargo, departmentId: u.departmentId || '' });
     setEditingUser(u);
     setError('');
     setModal('edit');
@@ -104,11 +110,15 @@ export default function UsersPage() {
     setSaving(true);
     setError('');
     try {
+      const payload = {
+        ...form,
+        departmentId: form.departmentId || undefined,
+      };
       if (modal === 'create') {
-        await apiClient.post('/users', form);
+        await apiClient.post('/users', payload);
         flash('Usuário criado com sucesso!');
       } else if (modal === 'edit' && editingUser) {
-        const { password, ...rest } = form;
+        const { password, ...rest } = payload;
         await apiClient.patch(`/users/${editingUser.id}`, rest);
         flash('Usuário atualizado!');
       }
@@ -199,6 +209,7 @@ export default function UsersPage() {
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">Nome</th>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">Email</th>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">Cargo</th>
+                <th className="text-left px-4 py-3 text-gray-600 font-medium">Área</th>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">Role</th>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">Status</th>
                 <th className="text-left px-4 py-3 text-gray-600 font-medium">Último Login</th>
@@ -211,6 +222,7 @@ export default function UsersPage() {
                   <td className="px-4 py-3 font-medium text-gray-900">{u.nome}</td>
                   <td className="px-4 py-3 text-gray-500">{u.email}</td>
                   <td className="px-4 py-3 text-gray-600">{u.cargo}</td>
+                  <td className="px-4 py-3 text-gray-500 text-xs">{u.department?.nome || '—'}</td>
                   <td className="px-4 py-3"><RoleBadge role={u.role} /></td>
                   <td className="px-4 py-3"><StatusBadge status={u.status} /></td>
                   <td className="px-4 py-3 text-gray-400 text-xs">
@@ -242,7 +254,7 @@ export default function UsersPage() {
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-8 text-center text-gray-400">
+                  <td colSpan={8} className="px-4 py-8 text-center text-gray-400">
                     Nenhum usuário encontrado
                   </td>
                 </tr>
@@ -313,6 +325,19 @@ export default function UsersPage() {
                     {CARGOS.map((c) => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Departamento</label>
+                <select
+                  value={form.departmentId}
+                  onChange={(e) => setForm((f) => ({ ...f, departmentId: e.target.value }))}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-green"
+                >
+                  <option value="">Sem departamento</option>
+                  {departments.map((d) => (
+                    <option key={d.id} value={d.id}>{d.nome}</option>
+                  ))}
+                </select>
               </div>
               {error && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-2 text-sm text-red-700">

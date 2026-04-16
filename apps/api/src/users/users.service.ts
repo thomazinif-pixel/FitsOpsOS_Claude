@@ -7,6 +7,8 @@ import * as bcrypt from 'bcrypt';
 const SELECT_USER = {
   id: true, nome: true, email: true, role: true, cargo: true,
   status: true, ultimoLogin: true, createdAt: true, updatedAt: true,
+  departmentId: true,
+  department: { select: { id: true, nome: true } },
 };
 
 @Injectable()
@@ -30,7 +32,7 @@ export class UsersService {
     if (exists) throw new ConflictException('Email já cadastrado');
     const passwordHash = await bcrypt.hash(dto.password, 12);
     return this.prisma.user.create({
-      data: { nome: dto.nome, email: dto.email, passwordHash, role: dto.role, cargo: dto.cargo },
+      data: { nome: dto.nome, email: dto.email, passwordHash, role: dto.role, cargo: dto.cargo, departmentId: dto.departmentId },
       select: SELECT_USER,
     });
   }

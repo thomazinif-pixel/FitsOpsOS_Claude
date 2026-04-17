@@ -31,6 +31,8 @@ export default function LoginPage() {
     }
   }
 
+  const isProd = process.env.NEXT_PUBLIC_APP_ENV === 'production';
+
   return (
     <div className="min-h-screen bg-brand-sidebar flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -41,31 +43,34 @@ export default function LoginPage() {
           </div>
           <h1 className="text-3xl font-bold text-white">Fits Ops OS</h1>
           <p className="text-gray-400 mt-1 text-sm">Diretoria de Operações — Fitbank</p>
+          {isProd && (
+            <span className="inline-block mt-3 px-4 py-1 bg-red-600 text-white text-xs font-bold rounded-full tracking-widest uppercase">
+              Produção
+            </span>
+          )}
         </div>
 
         <div className="bg-white rounded-2xl p-8 shadow-2xl">
           <h2 className="text-xl font-semibold text-gray-900 mb-6">Entrar no sistema</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green"
-                placeholder="seu@fitbank.com"
+                placeholder="E-mail"
                 required
                 autoFocus
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-green"
-                placeholder="••••••••"
+                placeholder="Senha"
                 required
               />
             </div>

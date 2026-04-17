@@ -20,8 +20,15 @@ export function Sidebar() {
   const router = useRouter();
   const { user, clearAuth } = useAuthStore();
 
+  const isProd = process.env.NEXT_PUBLIC_APP_ENV === 'production';
+
   return (
     <aside className="fixed top-0 left-0 h-screen w-64 bg-brand-sidebar flex flex-col z-40">
+      {isProd && (
+        <div className="bg-red-600 text-white text-xs font-bold text-center py-1.5 tracking-widest uppercase">
+          Produção
+        </div>
+      )}
       {/* Logo */}
       <div className="p-6 border-b border-gray-800">
         <div className="flex items-center gap-3">

@@ -20,7 +20,7 @@ export function Sidebar() {
   const router = useRouter();
   const { user, clearAuth } = useAuthStore();
 
-  const isProd = process.env.NEXT_PUBLIC_APP_ENV === 'production';
+  const isProd = typeof window !== 'undefined' && window.location.hostname === 'fits-ops-os-prod.vercel.app';
 
   return (
     <aside className="fixed top-0 left-0 h-screen w-64 bg-brand-sidebar flex flex-col z-40">

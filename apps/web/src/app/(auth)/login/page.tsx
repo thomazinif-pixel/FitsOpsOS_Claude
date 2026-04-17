@@ -31,7 +31,7 @@ export default function LoginPage() {
     }
   }
 
-  const isProd = process.env.NEXT_PUBLIC_APP_ENV === 'production';
+  const isProd = typeof window !== 'undefined' && window.location.hostname === 'fits-ops-os-prod.vercel.app';
 
   return (
     <div className="min-h-screen bg-brand-sidebar flex items-center justify-center p-4">

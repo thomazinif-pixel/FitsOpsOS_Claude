@@ -16,6 +16,8 @@ export default function PerformancePage() {
   const [loading, setLoading] = useState(true);
   const [catFilter, setCatFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [ownerFilter, setOwnerFilter] = useState('');
+  const [deptFilter, setDeptFilter] = useState('');
   const [expanded, setExpanded] = useState<string | null>(null);
   const [history, setHistory] = useState<Record<string, any[]>>({});
 
@@ -48,9 +50,14 @@ export default function PerformancePage() {
     }
   }
 
+  const owners = Array.from(new Map(analyses.filter((a) => a.kpi?.owner).map((a) => [a.kpi!.owner!.id, a.kpi!.owner!])).values());
+  const departments = Array.from(new Map(analyses.filter((a) => a.kpi?.department).map((a) => [a.kpi!.department!.id, a.kpi!.department!])).values());
+
   const filtered = analyses.filter((a) => {
     if (catFilter && a.kpi?.categoria !== catFilter) return false;
     if (statusFilter && a.status !== statusFilter) return false;
+    if (ownerFilter && a.kpi?.owner?.id !== ownerFilter) return false;
+    if (deptFilter && a.kpi?.department?.id !== deptFilter) return false;
     return true;
   });
 
@@ -87,6 +94,16 @@ export default function PerformancePage() {
           <option value="GREEN">No Alvo</option>
           <option value="YELLOW">Atenção</option>
           <option value="RED">Crítico</option>
+        </select>
+        <select value={ownerFilter} onChange={(e) => setOwnerFilter(e.target.value)}
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none">
+          <option value="">Todos os responsáveis</option>
+          {owners.map((o) => <option key={o.id} value={o.id}>{o.nome}</option>)}
+        </select>
+        <select value={deptFilter} onChange={(e) => setDeptFilter(e.target.value)}
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none">
+          <option value="">Todas as áreas</option>
+          {departments.map((d) => <option key={d.id} value={d.id}>{d.nome}</option>)}
         </select>
       </div>
 

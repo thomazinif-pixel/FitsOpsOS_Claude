@@ -19,6 +19,8 @@ export default function KpisPage() {
   const [search, setSearch] = useState('');
   const [catFilter, setCatFilter] = useState('');
   const [atoFilter, setAtoFilter] = useState('true');
+  const [ownerFilter, setOwnerFilter] = useState('');
+  const [deptFilter, setDeptFilter] = useState('');
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<KPI | null>(null);
 
@@ -50,12 +52,21 @@ export default function KpisPage() {
     load();
   }
 
+  const owners = Array.from(new Map(kpis.filter((k) => k.owner).map((k) => [k.owner!.id, k.owner!])).values());
+  const departments = Array.from(new Map(kpis.filter((k) => k.department).map((k) => [k.department!.id, k.department!])).values());
+
+  const visibleKpis = kpis.filter((kpi) => {
+    if (ownerFilter && kpi.ownerId !== ownerFilter) return false;
+    if (deptFilter && kpi.departmentId !== deptFilter) return false;
+    return true;
+  });
+
   return (
     <div className="p-8">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Gestão de KPIs</h1>
-          <p className="text-gray-500 text-sm mt-1">{kpis.length} KPIs carregados</p>
+          <p className="text-gray-500 text-sm mt-1">{visibleKpis.length} de {kpis.length} KPIs</p>
         </div>
         {isAdmin && (
           <button onClick={() => { setEditing(null); setFormOpen(true); }} className="btn-primary">
@@ -92,6 +103,22 @@ export default function KpisPage() {
           <option value="false">Inativos</option>
           <option value="">Todos</option>
         </select>
+        <select
+          value={ownerFilter}
+          onChange={(e) => setOwnerFilter(e.target.value)}
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none"
+        >
+          <option value="">Todos os responsáveis</option>
+          {owners.map((o) => <option key={o.id} value={o.id}>{o.nome}</option>)}
+        </select>
+        <select
+          value={deptFilter}
+          onChange={(e) => setDeptFilter(e.target.value)}
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none"
+        >
+          <option value="">Todas as áreas</option>
+          {departments.map((d) => <option key={d.id} value={d.id}>{d.nome}</option>)}
+        </select>
       </div>
 
       {loading ? <LoadingPage /> : (
@@ -111,7 +138,7 @@ export default function KpisPage() {
               </tr>
             </thead>
             <tbody>
-              {kpis.map((kpi) => {
+              {visibleKpis.map((kpi) => {
                 const lastAnalysis = kpi.analyses?.[0];
                 return (
                   <tr key={kpi.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
@@ -151,7 +178,7 @@ export default function KpisPage() {
                   </tr>
                 );
               })}
-              {kpis.length === 0 && (
+              {visibleKpis.length === 0 && (
                 <tr><td colSpan={9} className="text-center py-12 text-gray-400 text-sm">Nenhum KPI encontrado</td></tr>
               )}
             </tbody>

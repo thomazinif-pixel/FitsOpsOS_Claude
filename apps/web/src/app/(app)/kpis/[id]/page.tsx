@@ -25,7 +25,9 @@ export default function KpiDetailPage() {
   if (loading) return <LoadingPage />;
   if (!kpi) return <div className="p-8 text-gray-500">KPI não encontrado</div>;
 
-  const chartData = (kpi.analyses || [])
+  const analysesFrom2026 = (kpi.analyses || []).filter((a) => a.ano >= 2026);
+
+  const chartData = analysesFrom2026
     .sort((a, b) => a.ano === b.ano ? a.mes - b.mes : a.ano - b.ano)
     .map((a) => ({
       label: `${mesesLabels[a.mes - 1]}/${a.ano}`,
@@ -75,7 +77,7 @@ export default function KpiDetailPage() {
             <th className="text-center py-2 px-3 text-xs text-gray-500">Tendência</th>
           </tr></thead>
           <tbody>
-            {(kpi.analyses || []).map((a) => (
+            {analysesFrom2026.sort((a, b) => a.ano === b.ano ? a.mes - b.mes : a.ano - b.ano).map((a) => (
               <tr key={a.id} className="border-b border-gray-50">
                 <td className="py-2 px-3 font-medium">{mesesLabels[a.mes - 1]}/{a.ano}</td>
                 <td className="py-2 px-3 text-right font-bold">{a.percentualAtingimento.toFixed(1)}%</td>

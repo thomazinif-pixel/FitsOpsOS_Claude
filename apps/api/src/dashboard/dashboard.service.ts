@@ -127,7 +127,9 @@ export class DashboardService {
     const months: { mes: number; ano: number; label: string }[] = [];
     let m = mes, a = ano;
     for (let i = 0; i < 6; i++) {
-      months.unshift({ mes: m, ano: a, label: `${m}/${a}` });
+      if (a > 2026 || (a === 2026 && m >= 1)) {
+        months.unshift({ mes: m, ano: a, label: `${m}/${a}` });
+      }
       m--; if (m === 0) { m = 12; a--; }
     }
 
@@ -152,7 +154,9 @@ export class DashboardService {
     const months: { mes: number; ano: number }[] = [];
     let m = mes, a = ano;
     for (let i = 0; i < 3; i++) {
-      months.unshift({ mes: m, ano: a });
+      if (a > 2026 || (a === 2026 && m >= 1)) {
+        months.unshift({ mes: m, ano: a });
+      }
       m--; if (m === 0) { m = 12; a--; }
     }
 
@@ -184,7 +188,9 @@ export class DashboardService {
     let m = mes;
     let a = ano;
     for (let i = 0; i < 6; i++) {
-      months.unshift({ mes: m, ano: a });
+      if (a > 2026 || (a === 2026 && m >= 1)) {
+        months.unshift({ mes: m, ano: a });
+      }
       m--;
       if (m === 0) { m = 12; a--; }
     }

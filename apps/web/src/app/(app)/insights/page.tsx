@@ -105,7 +105,7 @@ export default function InsightsPage() {
             onChange={(e) => setAno(parseInt(e.target.value))}
             className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-green"
           >
-            {[2024, 2025, 2026, 2027].map((y) => <option key={y} value={y}>{y}</option>)}
+            {[2026, 2027].map((y) => <option key={y} value={y}>{y}</option>)}
           </select>
         </div>
       </div>
